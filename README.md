@@ -1,3 +1,3 @@
 # StreamAnalysisDemo
 
-streaming analysis with flink.
+streaming analysis.
