@@ -49,31 +49,32 @@ public class SourceData {
     public static void main(String[] args) throws Exception {
         //BasicConfigurator.configure();
 
-        ExecutionEnvironment env = ExecutionEnvironment.createLocalEnvironment();
+        /*ExecutionEnvironment env = ExecutionEnvironment.createLocalEnvironment();
         DataSet<Tuple2<Integer, Integer>> source = env.fromElements(new Tuple2<>(1,1), new Tuple2<>(2,2));
         DataSet<Tuple2<Integer, Integer>> result = source.filter((FilterFunction<Tuple2<Integer, Integer>>) value -> value.f0 % 2 == 0);
         DataSet<Tuple4<Integer, Integer, Integer, String>> dataSet = env
                 .readCsvFile("/Users/gallenvara/Downloads/QCLCD201611/201611remarks.txt").ignoreFirstLine()
                 .types(Integer.class, Integer.class, Integer.class, String.class);
-        //dataSet.print();
+        //dataSet.print();*/
         DataStream<String> streamSource = sEnv.readTextFile("/Users/gallenvara/Downloads/QCLCD201611/201611remarks.txt");
 
+        byte[] byt = new byte[2];
+        byt[0] = 1;
+        byt[1] = 0;
+        System.err.println(byt.hashCode());
         DataStream<Tuple4<Integer, Integer, Integer, String>> dataStream1 = streamSource
                 .filter((FilterFunction<String>) value -> value.charAt(0) != 'W')
-                .flatMap(new FlatMapFunction<String, Tuple4<Integer, Integer, Integer, String>>() {
-                    @Override
-                    public void flatMap(String s, Collector<Tuple4<Integer, Integer, Integer, String>> collector) throws Exception {
-                        String[] strings = s.split(",");
-                        String str = "";
-                        if (strings.length == 4) {
-                            str = strings[3];
-                        }
-                        collector.collect(new Tuple4<>(
-                                1,
-                                Integer.parseInt(strings[1]),
-                                Integer.parseInt(strings[2]),
-                                str));
+                .flatMap((FlatMapFunction<String, Tuple4<Integer, Integer, Integer, String>>) (s, collector) -> {
+                    String[] strings = s.split(",");
+                    String str = "";
+                    if (strings.length == 4) {
+                        str = strings[3];
                     }
+                    collector.collect(new Tuple4<>(
+                            1,
+                            Integer.parseInt(strings[1]),
+                            Integer.parseInt(strings[2]),
+                            str));
                 })
                 .filter((FilterFunction<Tuple4<Integer, Integer, Integer, String>>) value -> value.f2 % 2313 == 0)
                 .keyBy(1)
