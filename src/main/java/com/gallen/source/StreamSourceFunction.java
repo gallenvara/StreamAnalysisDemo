@@ -14,10 +14,10 @@ public class StreamSourceFunction implements SourceFunction<Integer> {
     public void run(SourceContext<Integer> sourceContext) throws InterruptedException{
         while (isRunning) {
             count++;//count the times for every iteration value
-            int value = random.nextInt(50);
-            if (value < 25) continue;
+            int value = random.nextInt(10000);
             sourceContext.collect(value);
-            Thread.sleep(100);
+            //Thread.sleep(100);
+            //Thread.sleep(5);
         }
     }
     public void cancel() {
